@@ -2,11 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import SignaturePad from 'react-signature-canvas';  // Import react-signature-canvas
 
 const SignatureCapture = ({ label, namePrefix, formData, setFormData }) => {
-    const [method, setMethod] = useState('draw'); // draw | upload | camera
+    const [method, setMethod] = useState('draw'); // draw | upload
     const sigPadRef = useRef();
-    const videoRef = useRef();
-    const canvasRef = useRef();
-    const [isCameraReady, setIsCameraReady] = useState(false);
 
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
@@ -28,38 +25,6 @@ const SignatureCapture = ({ label, namePrefix, formData, setFormData }) => {
         const dataURL = sigPadRef.current.getCanvas().toDataURL('image/png');
         setFormData(prev => ({ ...prev, [`${namePrefix}Signature`]: dataURL }));
     };
-
-    const captureImage = () => {
-        if (canvasRef.current && videoRef.current) {
-            const context = canvasRef.current.getContext('2d');
-            context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-            const dataURL = canvasRef.current.toDataURL('image/png');
-            setFormData(prev => ({ ...prev, [`${namePrefix}Signature`]: dataURL }));
-        }
-    };
-
-    useEffect(() => {
-        if (method === 'camera') {
-            navigator.mediaDevices
-                .getUserMedia({ video: true })
-                .then((stream) => {
-                    videoRef.current.srcObject = stream;
-                    setIsCameraReady(true);
-                })
-                .catch((err) => {
-                    console.error('Error accessing camera: ', err);
-                    setIsCameraReady(false);
-                });
-        }
-        return () => {
-            if (videoRef.current && videoRef.current.srcObject) {
-                const stream = videoRef.current.srcObject;
-                const tracks = stream.getTracks();
-                tracks.forEach(track => track.stop());
-                videoRef.current.srcObject = null;
-            }
-        };
-    }, [method]);
 
     return (
         <div className="border p-6 rounded-lg space-y-4 w-full max-w-full">
@@ -92,13 +57,6 @@ const SignatureCapture = ({ label, namePrefix, formData, setFormData }) => {
                 >
                     Upload
                 </button>
-                <button
-                    type="button"
-                    onClick={() => { setMethod('camera'); }}
-                    className="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                >
-                    Camera
-                </button>
             </div>
 
             {method === 'draw' && (
@@ -130,31 +88,6 @@ const SignatureCapture = ({ label, namePrefix, formData, setFormData }) => {
                         onChange={handleFileUpload}
                         className="w-full p-3 border border-gray-300 rounded-md"
                     />
-                </div>
-            )}
-
-            {method === 'camera' && (
-                <div>
-                    <video
-                        ref={videoRef}
-                        autoPlay
-                        className="w-full h-32 border rounded-md"
-                    />
-                    <canvas
-                        ref={canvasRef}
-                        width="640"
-                        height="480"
-                        className="hidden"
-                    />
-                    {isCameraReady && (
-                        <button
-                            type="button"
-                            onClick={captureImage}
-                            className="mt-2 text-blue-500 underline"
-                        >
-                            Capture
-                        </button>
-                    )}
                 </div>
             )}
         </div>
