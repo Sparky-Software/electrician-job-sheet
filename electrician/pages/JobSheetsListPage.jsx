@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, FileText } from 'lucide-react';
+import generatePDF from '../utils/pdfGenerator';
 
 const JobSheetsListPage = () => {
     const navigate = useNavigate();
@@ -41,61 +42,76 @@ const JobSheetsListPage = () => {
         }
     };
 
+    const handleViewPDF = (jobSheet) => {
+        generatePDF(jobSheet.formData, jobSheet.labour, jobSheet.materials);
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 py-6 sm:px-8 lg:px-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-3xl font-semibold text-gray-800">Previous Job Sheets</h1>
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-8 py-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">Previous Job Sheets</h1>
                     <button
                         onClick={() => navigate('/')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                        className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center"
                     >
                         New Job Sheet
                     </button>
                 </div>
 
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sheet No</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {jobSheets.map((sheet) => (
-                                <tr key={sheet.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {sheet.formData.dayWorkSheetNo}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {sheet.formData.customer}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {sheet.formData.date}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleEdit(sheet)}
-                                                className="text-blue-600 hover:text-blue-900"
-                                            >
-                                                <Edit className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(sheet.id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sheet No</th>
+                                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {jobSheets.map((sheet) => (
+                                    <tr key={sheet.id} className="hover:bg-gray-50">
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {sheet.formData.dayWorkSheetNo}
+                                        </td>
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {sheet.formData.customer}
+                                        </td>
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {sheet.formData.date}
+                                        </td>
+                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <div className="flex space-x-4">
+                                                <button
+                                                    onClick={() => handleViewPDF(sheet)}
+                                                    className="text-green-600 hover:text-green-900 p-1"
+                                                    title="View PDF"
+                                                >
+                                                    <FileText className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(sheet)}
+                                                    className="text-blue-600 hover:text-blue-900 p-1"
+                                                    title="Edit"
+                                                >
+                                                    <Edit className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(sheet.id)}
+                                                    className="text-red-600 hover:text-red-900 p-1"
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
