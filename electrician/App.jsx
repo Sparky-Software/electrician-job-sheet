@@ -1,17 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import JobSheetPage from './pages/JobSheetPage';
+import JobSheetsListPage from './pages/JobSheetsListPage';
 
-function App() {
+const App = () => {
     return (
-        <Router basename="/electrician">
-            <div className="App">
-                <Routes>
-                    <Route path="/" element={<JobSheetPage />} />
-                </Routes>
-            </div>
+        <Router basename="/electrician/">
+            <Routes>
+                <Route path="/" element={<JobSheetPage />} />
+                <Route path="/job-sheets/" element={<JobSheetsListPage />} />
+            </Routes>
         </Router>
     );
-}
+};
 
 export default App;
